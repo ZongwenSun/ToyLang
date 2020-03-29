@@ -3,12 +3,29 @@
  */
 package edu.bit.szongwen.toylang;
 
+import java.io.InputStream;
+
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
+
 public class App {
-    public String getGreeting() {
-        return "Hello world.";
-    }
 
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        InputStream inputStream = App.class.getResourceAsStream("/example1.txt");
+
+        try {
+            Lexer lexer = new ToyLexer(CharStreams.fromStream(inputStream));
+            TokenStream tokenStream = new CommonTokenStream(lexer);
+            ToyParser parser = new ToyParser(tokenStream);
+            ParseTree tree = parser.program();
+            CalculateVisitor visitor = new CalculateVisitor();
+            visitor.visit(tree);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("error " + e.toString());
+        }
     }
 }

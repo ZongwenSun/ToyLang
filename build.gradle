@@ -12,6 +12,8 @@ plugins {
 
     // Apply the application plugin to add support for building an application
     id 'application'
+
+    id 'antlr'
 }
 
 repositories {
@@ -24,9 +26,31 @@ dependencies {
     // This dependency is found on compile classpath of this component and consumers.
     implementation 'com.google.guava:guava:27.0.1-jre'
 
+    // antlr
+    antlr 'org.antlr:antlr4:4.7.2'
+    implementation 'org.antlr:antlr4-runtime:4.7.2'
+
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
 }
+
+
+File antlrOutDir = new File("build/generated-src/antlr/main/edu/bit/szongwen/toylang")
+generateGrammarSource {
+    antlrOutDir.mkdirs()
+    maxHeapSize = "64m"
+    arguments += ['-package', 'edu.bit.szongwen.toylang', '-visitor', '-no-listener', "-Xexact-output-dir"]
+    outputDirectory = antlrOutDir
+}
+
+compileJava.dependsOn generateGrammarSource
+
+sourceSets {
+    generated {
+        java.srcDir 'build/generated-src/antlr/main/'
+    }
+}
+compileJava.source sourceSets.generated.java, sourceSets.main.java
 
 // Define the main class for the application
 mainClassName = 'edu.bit.szongwen.toylang.App'
